@@ -1,7 +1,7 @@
 # tools
 [tool.black]
 line-length = 88
-target-version = "py310"
+target-version = ["py310"]
 
 # https://github.com/charliermarsh/ruff
 [tool.ruff]

@@ -1,16 +1,23 @@
 repos:
 
+  # Standard Python Files
   - repo: https://github.com/psf/black
-    rev: 22.6.0
+    rev: 23.9.1
     hooks:
       - id: black
 
   - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: v0.0.216
+    rev: v0.0.291
     hooks:
       - id: ruff
         args: ["--fix"]
 
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.5.1
+    hooks:
+      - id: mypy
+
+  # Notebooks
   - repo: https://github.com/nbQA-dev/nbQA
     rev: 1.7.0
     hooks:
@@ -18,8 +25,3 @@ repos:
       - id: nbqa-ruff
         args: ["--fix"]
       - id: nbqa-mypy
-
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v0.971
-    hooks:
-      - id: mypy
