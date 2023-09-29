@@ -1,0 +1,5 @@
+bitsandbytes>=0.41,<1
+datasets>=2,<3
+git+https://github.com/huggingface/transformers.git@0b192de1f353b0e04dad4813e02e2c672de077be
+git+https://github.com/huggingface/peft.git@52ff0cde9f2cc64059e171c2cfd94512914c85df
+git+https://github.com/huggingface/accelerate.git@658492fb410396d8d1c1241c1cc2412a908b431b
