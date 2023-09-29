@@ -113,3 +113,8 @@ ENV/
 
 # VSCode
 .vscode
+
+# Project specific
+cdp-datasets/
+councils-in-action-2023-06-01.huggingdata
+.temp-councils-in-action-dataset/

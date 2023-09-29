@@ -1,3 +1,6 @@
 pre-commit>=2.20.0
+fsspec==2023.6.0
+gcsfs==2023.6.0
+git+https://github.com/CouncilDataProject/cdp-data.git@af24abb0100002b83553e64be7e429b38c634606
 ipython
 jupyterlab

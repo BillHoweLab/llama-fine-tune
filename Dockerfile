@@ -11,14 +11,14 @@ RUN apt update && apt install -y \
 # Install and setup Python and pip
 RUN add-apt-repository -y ppa:deadsnakes/ppa \
     && apt install -y \
-    python3.10 \
-    python3.10-dev \
-    python3.10-distutils \
-    && curl -sS https://bootstrap.pypa.io/get-pip.py | python3.10
+    python3.11 \
+    python3.11-dev \
+    python3.11-distutils \
+    && curl -sS https://bootstrap.pypa.io/get-pip.py | python3.11
 
-# Set python3.10 to default python3 and python
-RUN ln -sf /usr/bin/python3.10 /usr/bin/python3 \
-    && ln -sf /usr/bin/python3.10 /usr/bin/python \
+# Set python3.11 to default python3 and python
+RUN ln -sf /usr/bin/python3.11 /usr/bin/python3 \
+    && ln -sf /usr/bin/python3.11 /usr/bin/python \
     && ln -sf /usr/bin/pip3 /usr/bin/pip
 
 # Pull repo
