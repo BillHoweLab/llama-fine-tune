@@ -30,6 +30,6 @@ jobs:
     - name: Install Dependencies
       run: |
         python -m pip install --upgrade pip wheel
-        pip install .[lint]
+        pip install -r requirements-dev.txt
     - name: Lint
       run: just lint
