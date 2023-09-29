@@ -1,15 +1,15 @@
 #!/usr/bin/env python
 
-import shutil
-from pathlib import Path
-from functools import partial
 import logging
+import shutil
+from functools import partial
+from pathlib import Path
 from uuid import uuid4
 
-from datasets import load_dataset
-from tqdm.contrib.concurrent import process_map
-from tqdm import tqdm
 import typer
+from datasets import load_dataset
+from tqdm import tqdm
+from tqdm.contrib.concurrent import process_map
 
 ###############################################################################
 
@@ -20,6 +20,7 @@ log = logging.getLogger(__name__)
 app = typer.Typer()
 
 ###############################################################################
+
 
 def _convert_cdp_transcript_to_text_file(
     transcript_file: str | Path,
@@ -44,9 +45,9 @@ def _convert_cdp_transcript_to_text_file(
 
     # Convert transcript file to text file
     output_file = output_dir / f"{uuid4()}.txt"
-    
+
     # Load transcript
-    with open(transcript_file, "r") as f:
+    with open(transcript_file) as f:
         transcript = Transcript.from_json(f.read())
 
     # Rewrite as text file
@@ -68,13 +69,16 @@ def preprocess_councils_in_action(
         raise ImportError(
             "To use this function, you need to install the `cdp-data` Python package."
         ) from e
-    
+
+    # Final dataset storage dir
+    final_dataset_storage_dir = "councils-in-action-2023-06-01.huggingdata"
+
     # Create temp storage dir
-    TEMP_STORAGE_DIR = Path(f".temp-councils-in-action-dataset/")
-    TEMP_STORAGE_DIR.mkdir(exist_ok=True)
-    
+    temp_storage_dir = Path(".temp-councils-in-action-dataset/")
+    temp_storage_dir.mkdir(exist_ok=True)
+
     # List of good munis
-    MUNIS = [
+    munis = [
         CDPInstances.Seattle,
         CDPInstances.KingCounty,
         CDPInstances.Missoula,
@@ -88,8 +92,6 @@ def preprocess_councils_in_action(
         # CDPInstances.Richmond,
         # CDPInstances.Louisville,
         # CDPInstances.Atlanta,
-
-
         # CDPInstances.Albuquerque,  # Albuquerque is hit or miss on data quality
         # CDPInstances.Oakland,  # Oakland is hit or miss on data quality
         # CDPInstances.Charlotte,  # Charlotte is hit or miss on data quality
@@ -99,9 +101,9 @@ def preprocess_councils_in_action(
     # Create partial function for converting transcripts to text files
     convert_cdp_transcript_to_text_file = partial(
         _convert_cdp_transcript_to_text_file,
-        output_dir=TEMP_STORAGE_DIR,
+        output_dir=temp_storage_dir,
     )
-    
+
     # Wrap the whole process in a directory cleaning process
     try:
         # For each muni
@@ -109,7 +111,7 @@ def preprocess_councils_in_action(
         # 2. get the dataset
         # 3. store each transcript to single text file in parallel
         all_text_files = []
-        for muni in tqdm(MUNIS, desc="Processing each municipality"):
+        for muni in tqdm(munis, desc="Processing each municipality"):
             # Connect to the infrastructure
             connect_to_infrastructure(infrastructure_slug=muni)
 
@@ -123,39 +125,42 @@ def preprocess_councils_in_action(
                 raise_on_error=False,
                 tqdm_kws={"leave": False},
             )
-            
+
             # Process each transcript
             all_text_files.extend(
                 process_map(
                     convert_cdp_transcript_to_text_file,
                     ds.transcript_path,
-                    desc=f"Dumping transcripts to text files",
+                    desc="Dumping transcripts to text files",
                     leave=False,
                 )
             )
-        
+
         # Create new dataset from text files
         cia_dataset = load_dataset(
             "text",
             data_files=[str(f) for f in all_text_files],
             split="train",
-            cache_dir=TEMP_STORAGE_DIR,
+            cache_dir=temp_storage_dir,
         )
 
         # Store to disk
-        cia_dataset.save_to_disk("councils-in-action-2023-06-01.huggingdata")
-    
+        cia_dataset.save_to_disk(final_dataset_storage_dir)
+
     # Clean up temp storage dir
     finally:
-        shutil.rmtree(TEMP_STORAGE_DIR)
+        shutil.rmtree(temp_storage_dir)
+
+    print(f"Full dataset stored to '{final_dataset_storage_dir}'.")
+
 
 @app.command()
-def upload(dataset_path: str, storage_uri: str):
+def upload(dataset_path: str, storage_uri: str) -> None:
     pass
 
 
 @app.command()
-def download(uri: str):
+def download(uri: str) -> None:
     pass
 
 
